@@ -1,0 +1,52 @@
+{% extends 'myapp/base.html' %}
+{% block songs_active %}active{% endblock %}
+
+{% block title %}Songs{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Album</th>
+            <th>Audio File</th>
+            <th>Favorite</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for song in all_songs %}
+              <tr>
+                  <td>{{ song.song_title }}</td>
+                  <td>{{ song.album.artist }}</td>
+                  <td>{{ song.album.title }}</td>
+                  <td>
+                      <a target="_blank" href="#">
+                          <button type="button" class="btn btn-success btn-xs">
+                              <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                          </button>
+                      </a>
+                  </td>
+                  <td>
+                      <a href="#" class="btn-favorite"><span class="glyphicon glyphicon-star"></span></a>
+                  </td>
+                  <td>
+                      <form action="#" method="post" style="display: inline;" onclick="return confirm('Are you sure you want to delete this album?')">
+                          {% csrf_token %}
+                          <input type="hidden" name="song_id" value="{{ song.id }}" />
+                          <button type="submit" class="btn btn-danger btn-xs">
+                              <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete
+                          </button>
+                      </form>
+                  </td>
+              </tr>
+          {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

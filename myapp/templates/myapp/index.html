@@ -1,0 +1,111 @@
+{% extends 'myapp/base.html' %}
+{% block albums_active %}active{% endblock %}
+
+{% block title %} {% endblock %}
+
+{% block body %}
+
+
+<div class="albums-container container-fluid">
+    <!-- Albums -->
+    <div class="row">
+        <div class="col-sm-12">
+            <h3>{{ user.username }}'s Albums</h3>
+        </div>
+        {% if all_albums %}
+            {% for album in all_albums %}
+                <div class="col-sm-6 col-lg-4">
+                    <div class="thumbnail" id="albumPanels">
+                        <a href="{% url 'myapp:detail' album.id %}">
+                            <img src="{{ album.logo.url }}" class="img-responsive" id="albumLogo">
+                        </a>
+                        <div class="caption">
+                            <h2>{{ album.title }}</h2>
+                            <h4>{{ album.artist }}</h4>
+
+                            <!-- View Details -->
+                            <a href="{% url 'myapp:detail' album.id %}" class="btn btn-primary btn-sm" role="button">View Details</a>
+
+                            <!-- Delete Album -->
+                            <form action="{% url 'myapp:album-delete' album.id %}" method="post" style="display: inline;" onclick="return confirm('Are you sure you want to delete this album?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="album_id" value="{{ album.id }}" />
+                                <button type="submit" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                            </form>
+
+                            <!-- Favorite Album -->
+                            <a href="#" class="btn btn-default btn-sm btn-favorite" role="button" onclick="alert('Favoriting has not been added yet!')">
+                                <span class="glyphicon glyphicon-star"></span>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+                {% cycle '' '' '' '' '' '<div class="clearfix visible-lg"></div>' %}
+            {% endfor %}
+        {% else %}
+            <div class="col-sm-12">
+                <br>
+                <a href="{% url 'myapp:album-add' %}">
+                    <button type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Add an Album
+                    </button>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- If user searches and there are songs -->
+    {% if songs %}
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Songs</h3>
+            </div>
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Song Title</th>
+                                    <th>Artist</th>
+                                    <th>Audio File</th>
+                                    <th>Album</th>
+                                    <th>Favorite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for song in songs %}
+                                    <tr>
+                                        <td>{{ song.song_title }}</td>
+                                        <td>{{ song.album.artist }}</td>
+                                        <td>
+                                            <a target="_blank" href="#">
+                                                <button type="button" class="btn btn-success btn-xs">
+                                                    <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                                                </button>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="#">
+                                                <img src="#" class="img-responsive" style="width: 20px; float: left; margin-right: 10px;" />
+                                            </a>
+                                            <a href="#">{{ song.album.album_title }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="btn-favorite"><span class="glyphicon glyphicon-star {% if song.is_favorite %}active{% endif %}"></span></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

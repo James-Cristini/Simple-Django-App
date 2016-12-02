@@ -1,0 +1,93 @@
+{% extends 'myapp/base.html' %}
+{% block title %}{{ album }}{% endblock %}
+{% block songs_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid songs-container">
+
+    <div class="row">
+
+        <!-- Left Album Info -->
+        <div class="col-sm-4 col-md-3">
+            <div class="panel panel-default" id="albumPanels">
+                <div class="panel-body">
+                    <a href="{% url 'myapp:detail' album.id %}">
+                        {% if album.logo %}
+                            <img src="{{ album.logo.url }}" class="img-responsive">
+                        {% else %}
+                            <h3>No image to display</h3>
+                        {% endif %}
+                    </a>
+                    <h1 id="albumTitle">{{ album.title }} </h1>
+                      <p id = "genre">{{ album.genre }}</p>
+                    <h3>{{ album.artist }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Song Info -->
+        <div class="col-sm-8 col-md-9">
+
+            <ul class="nav nav-pills" style="margin-bottom: 10px;">
+                <li role="presentation" class="active"><a href="{% url 'myapp:album-update' album.id %}">Edit</a></li>
+                <li role="presentation" class="active"><a href="{% url 'myapp:detail' album.id %}">View All</a></li>
+                <li role="presentation"><a href="{% url 'myapp:create_song' album.id%}">Add New Song</a></li>
+            </ul>
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <h3>All Songs</h3>
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Audio File</th>
+                            <th>Favorite</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for song in album.song_set.all %}
+                            <tr>
+                                <td>{{ song.song_title }}</td>
+                                <td>
+                                    <a target="" href="#">
+                                        <button type="button" class="btn btn-success btn-xs" onclick="alert('No file loaded')">
+                                            <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                                        </button>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#" class="btn-favorite"><span class="glyphicon glyphicon-star" onclick="alert('Favoriting has not been added yet!')"></span></a>
+                                </td>
+                                <td>
+                                  <form action="{% url 'myapp:delete_song' album.id song.id %}" method="post" style="display: inline;" onclick="return confirm('Are you sure you want to delete this album?')">
+                                      {% csrf_token %}
+                                      <input type="hidden" name="song_id" value="{{ song.id }}" />
+                                      <button type="submit" class="btn btn-danger btn-xs">
+                                          <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete
+                                      </button>
+                                  </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
