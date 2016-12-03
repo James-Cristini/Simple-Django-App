@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout #verifies if user exists, and attaches session id
 from django.views import generic
+from django.db.models import Q
 from django.views.generic import View
 from .models import Album, Song
 from .forms import UserForm, SongForm
@@ -20,16 +21,16 @@ def index(request):
     else:
         print request.user
         albums = Album.objects.filter(user=request.user)
-        #song_results = Song.objects.all()
+        song_results = Song.objects.all()
         query = request.GET.get("q")
         if query:
             albums = albums.filter(
-                Q(album_title__icontains=query) |
+                Q(title__icontains=query) |
                 Q(artist__icontains=query)
             ).distinct()
-            # song_results = song_results.filter(
-            #     Q(song_title__icontains=query)
-            # ).distinct()
+            song_results = song_results.filter(
+                Q(song_title__icontains=query)
+            ).distinct()
             return render(request, 'myapp/index.html', {
                 'all_albums': albums,
                 'songs': song_results,
@@ -58,6 +59,21 @@ def songs(request, filter_by):
                 users_songs = users_songs.filter(is_favorite=True)
         except Album.DoesNotExist:
             users_songs = []
+        song_results = Song.objects.all()
+        albums = Album.objects.filter(user=request.user)
+        query = request.GET.get("q")
+        if query:
+            albums = albums.filter(
+                Q(title__icontains=query) |
+                Q(artist__icontains=query)
+            ).distinct()
+            song_results = song_results.filter(
+                Q(song_title__icontains=query)
+            ).distinct()
+            return render(request, 'myapp/index.html', {
+                'all_albums': albums,
+                'songs': song_results,
+            })
         return render(request, 'myapp/songs.html', {
             'all_songs': users_songs.order_by('song_title').order_by('album'),
             'filter_by': filter_by,
